@@ -1,0 +1,6 @@
+<resources>
+    <string name="app_name">MyWikitudeAppForAndroid</string>
+    <string name="compass_accuracy_low">「8」の字を描くように端末を動かしてコンパスの再キャリブレーションを行ってください。</string>
+    <string name="location_fetching">現在地を探っています...</string>
+    <string name="videosrawables_fallback">この端末では、ビデオは（部分的に描画できないので）フルスクリーンでレンダリングされます。</string>
+</resources>

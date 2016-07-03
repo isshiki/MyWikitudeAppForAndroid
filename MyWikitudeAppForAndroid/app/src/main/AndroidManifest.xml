@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+	package="isshiki.mywtappforandroid">
+
+	<!-- アクセス許可を設定します。上から順に、以下が指定されています。
+		・インターネット
+		・おおよその位置情報（ネットワーク基地局）
+		・精細な位置情報（GPS）
+		・ネットワーク状態
+		・Wi-Fi状態
+		・GPSアクセス
+		・カメラ
+		・SDカードなど外部ストレージへの書き込み（※スクリーンキャプチャの保存などをする際に必要ですが、本サンプルではコードはありますが実質的には使っていません。）
+	-->
+	<uses-permission android:name="android.permission.INTERNET" />
+	<uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+	<uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+	<uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+	<uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+	<uses-permission android:name="android.permission.ACCESS_GPS" />
+	<uses-permission android:name="android.permission.CAMERA" />
+	<uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+
+	<!-- このアプリではOpenGL ES 2.0が必要なことをシステムに伝えます。 -->
+	<uses-feature android:glEsVersion="0x00020000" android:required="true" />
+
+	<!-- カメラの利用 -->
+	<uses-feature android:name="android.hardware.camera" android:required="true" />
+
+	<!-- 位置情報の利用 -->
+	<uses-feature android:name="android.hardware.location" android:required="true" />
+
+	<!-- 加速度計の利用 -->
+	<uses-feature android:name="android.hardware.sensor.accelerometer" android:required="true" />
+
+	<!-- コンパスの利用 -->
+	<uses-feature android:name="android.hardware.sensor.compass" android:required="true" />
+
+	<!-- 小さな解像度のスクリーンは非サポート -->
+	<supports-screens
+		android:smallScreens="false" android:largeScreens="true"
+		android:normalScreens="true" android:anyDensity="true"
+		android:xlargeScreens="true" />
+
+	<!-- アプリケーション定義を指定します。上から順に、以下が指定されています。
+		・バックアップ／復元のサポート
+		・アプリケーションアイコン（"\app\src\main\res\mipmap-*"フォルダーに格納されている画像ファイルの名前）
+		・ユーザー向けのアプリケーションラベル（"\app\src\main\res\values\strings.xml"ファイルに定義されている「app_name」文字列）
+		・アプリケーション内の全アクティビティ（＝UIを持つ実行単位）に対するデフォルトテーマ（"\app\src\main\res\values\styles.xml"ファイルに定義されている「AppTheme」スタイル）
+	-->
+	<application
+		android:allowBackup="true"
+		android:icon="@mipmap/ic_launcher"
+		android:label="@string/app_name"
+		android:theme="@style/AppTheme">
+
+		<!-- アプリケーション定義を指定します。上から順に、以下が指定されています。
+			・アクティビティ（名前、「画面のサイズや向き」が変更されたときにアクティビティを再起動させないための構成）
+				- インテント（＝アプリケーションやアクティビティとのやり取り）フィルターの指定：
+					・「アプリケーション起動」アクション
+					・「ホーム画面からの起動」カテゴリ
+			※AndroidのActivityは端末を縦持ちや横持ちした際に、アクティビティの破棄と再生成が行われます。WikitudeではHTMLでレスポンシブに対応できるため、再作成は不要です。再作成されないようにする設定が「android:configChanges="screenSize|orientation"」になります。
+		-->
+		<activity android:name=".MainActivity" android:configChanges="screenSize|orientation">
+			<intent-filter>
+				<action android:name="android.intent.action.MAIN" />
+				<category android:name="android.intent.category.LAUNCHER" />
+			</intent-filter>
+		</activity>
+
+		<!--
+			※注意： 以下は、App Indexing API（＝アプリをGoogle検索に登録してもらうためのAPI）向けにGoogle Playサービスを追加するために、Android Studioにより自動生成されたコードです。
+			詳細はこちらを参照（英語）： https://g.co/AppIndexing/AndroidStudio
+		 -->
+		<meta-data
+			android:name="com.google.android.gms.version"
+			android:value="@integer/google_play_services_version" />
+
+	</application>
+
+</manifest>
