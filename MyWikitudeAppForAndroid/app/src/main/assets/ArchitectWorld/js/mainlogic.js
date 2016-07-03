@@ -123,17 +123,17 @@ var World = {
 		if ("number" !== typeof centerPointLatitude || centerPointLatitude > 90) centerPointLatitude = 90;
 		if ("number" !== typeof centerPointLongitude || centerPointLongitude < -180) centerPointLongitude = -180;
 		if ("number" !== typeof centerPointLongitude || centerPointLongitude > 180) centerPointLongitude = 180;
-		if ("number" !== typeof centerPointAltitude) centerPointAltitude = parseFloat(centerPointAltitude); // 「centerPointAltitude = AR.CONST.UNKNOWN_ALTITUDE;」としても、ユーザーレベル高度になります。
-		if (centerPointAccuracy > 20) return; // 精度値が20mより大きい場合は精度が悪すぎるので、以下の処理を実行しない
+		if ("number" !== typeof centerPointAltitude) centerPointAltitude = parseFloat(centerPointAltitude); // 「centerPointAltitude = AR.CONST.UNKNOWN_ALTITUDE;」としても、同じユーザーレベル高度になります。
+		if ("number" !== typeof centerPointAccuracy || centerPointAccuracy > 20) return; // 精度値が20mより大きい場合は精度が悪すぎるので、以下の処理を実行しない
 		
 		var poiData = [];
 		
 		var loadPoisFromMyJsonDataVariable = function() {
-		
+			
 			for (var i = 0, length = myJsonData.length; i < length; i++) {
 				
 				var distance = World.getDistance(myJsonData[i].latitude, centerPointLatitude, myJsonData[i].longitude, centerPointLongitude);
-				if (distance > 500.0) continue;  // 0.05km（＝500m）以上先のPOIデータは破棄します。
+				if (distance > 500.0) continue;  // 0.5km（＝500m）以上先のPOIデータは破棄します。
 				var distanceString = (distance > 999) ? ((distance / 1000).toFixed(2) + " km") : (Math.round(distance) + " m");
 				
 				poiData.push({
@@ -141,7 +141,7 @@ var World = {
 					"name":      (myJsonData[i].name),       // レストラン名。
 					"latitude":  (myJsonData[i].latitude),   // 緯度。
 					"longitude": (myJsonData[i].longitude),  // 経度。
-					"altitude":  (centerPointAltitude),      // 高度。現在地の高度に合わせて表示しています。ちなみに標高の平均といえる「日本水準原点」の値は「24.3900」です。
+					"altitude":  (centerPointAltitude),      // 高度。ユーザー現在地の高度に合わせて表示しています。ちなみに標高の平均といえる「日本水準原点」の値は「24.3900」です。
 					"distance":  (distanceString),           // 現在の地点からの距離（単位は「km」もしくは「m」）。
 					"sortorder": (distance)                  // 距離でソートできるようにしています。
 				});
