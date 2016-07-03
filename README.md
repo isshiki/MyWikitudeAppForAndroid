@@ -1,0 +1,2 @@
+# MyWikitudeAppForiAndroid
+Wikitude SDK（JavaScript API）を用いたロケーションベースARのサンプルアプリで、周囲500m範囲内（最大10件）のレストランの方角と距離をポップアップ表示します。
