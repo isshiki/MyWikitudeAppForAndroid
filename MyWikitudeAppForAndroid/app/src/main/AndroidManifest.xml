@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-	package="isshiki.mywtappforandroid">
+	package="isshiki.mywikitudeappforandroid">
 
 	<!-- アクセス許可を設定します。上から順に、以下が指定されています。
 		・インターネット

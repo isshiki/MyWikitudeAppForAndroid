@@ -1,4 +1,4 @@
-package isshiki.mywtappforandroid;
+package isshiki.mywikitudeappforandroid;
 
 public interface ILocationProvider {
 

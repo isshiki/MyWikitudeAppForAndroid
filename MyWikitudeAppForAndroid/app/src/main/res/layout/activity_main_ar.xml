@@ -3,7 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="isshiki.mywtappforandroid.MainActivity">
+    tools:context="isshiki.mywikitudeappforandroid.MainActivity">
 
     <com.wikitude.architect.ArchitectView
         android:id="@+id/architectView"

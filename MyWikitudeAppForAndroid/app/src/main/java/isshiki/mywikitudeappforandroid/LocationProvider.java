@@ -1,4 +1,4 @@
-package isshiki.mywtappforandroid;
+package isshiki.mywikitudeappforandroid;
 
 import android.content.Context;
 import android.location.Location;

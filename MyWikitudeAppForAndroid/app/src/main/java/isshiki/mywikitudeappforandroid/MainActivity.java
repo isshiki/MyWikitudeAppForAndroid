@@ -1,4 +1,4 @@
-package isshiki.mywtappforandroid;
+package isshiki.mywikitudeappforandroid;
 
 import android.Manifest;
 import android.content.Intent;
@@ -223,7 +223,7 @@ public class MainActivity extends AppCompatActivity {
 				// TODO: アプリのアクティビティコンテンツと合致するWebページコンテンツを持っているなら、自動生成されたWebページURLが正しいかどうか確認してください。持っていない場合は、URLに「null」を指定してください。
 				Uri.parse("http://host/path"),
 				// TODO: 自動生成されたアプリURLが正しいかどうか確認してください。
-				Uri.parse("android-app://isshiki.mywtappforandroid/http/host/path")
+				Uri.parse("android-app://isshiki.mywikitudeappforandroid/http/host/path")
 		);
 		AppIndex.AppIndexApi.start(client, viewAction);
 	}
@@ -323,7 +323,7 @@ public class MainActivity extends AppCompatActivity {
 				// TODO: アプリのアクティビティコンテンツと合致するWebページコンテンツを持っているなら、自動生成されたWebページURLが正しいかどうか確認してください。持っていない場合は、URLに「null」を指定してください。
 				Uri.parse("http://host/path"),
 				// TODO: 自動生成されたアプリURLが正しいかどうか確認してください。
-				Uri.parse("android-app://isshiki.mywtappforandroid/http/host/path")
+				Uri.parse("android-app://isshiki.mywikitudeappforandroid/http/host/path")
 		);
 		AppIndex.AppIndexApi.end(client, viewAction);
 		client.disconnect();

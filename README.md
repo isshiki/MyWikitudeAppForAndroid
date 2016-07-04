@@ -8,7 +8,7 @@ Wikitude SDK（JavaScript API）を用いたロケーションベースARのサ�
 
 ## ビルド・実行するための注意点
 
-- /MyWikitudeAppForAndroid/app/src/main/java/isshiki/mywtappforandroid/MainActivity.java
+- /MyWikitudeAppForAndroid/app/src/main/java/isshiki/mywikitudeappforandroid/MainActivity.java
 
 MainActivity.javaファイル内の`WIKITUDE_SDK_KEY`の値を、実際に取得した正しい「Wikitude」のキーにしてください。
 
