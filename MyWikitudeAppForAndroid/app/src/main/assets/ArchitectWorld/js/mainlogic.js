@@ -3,6 +3,7 @@ var World = {
 	
 	// TODO: 適切な「リクルートWEBサービス（ホットペーパー）」のキーを指定してください。
 	webApiKeyID: '＜ライセンスキーを書き直してください！ 例：abc01234567890de＞',
+
 	// データロードを1回のみにするためのフラグ。
 	initiallyLoadedData: false,
 
@@ -168,13 +169,13 @@ var World = {
 						params.offset_page++;
 						loadPOIsFromWebApi();  // さらに次のページのデータを読み込む（再帰呼び出し）
 					} else {
-						World.loadPOIsFromCachedData(centerPointLatitude, centerPointLongitude, centerPointAltitude, centerPointAccuracy);  // これ以上、データは読み込まない。
+						World.loadPOIsFromCachedData(centerPointLatitude, centerPointLongitude, centerPointAltitude, centerPointAccuracy, false);  // これ以上、データは読み込まない。
 					}
 				} else {
 					if (params.offset_page == 1) {
 						World.updateStatusMessage("0件（レストランが見付かりません！）、緯度・経度：" + lat + ", " + lon);
 					} else {
-						World.loadPOIsFromCachedData(centerPointLatitude, centerPointLongitude, centerPointAltitude, centerPointAccuracy);  // これ以上、データは読み込まない。
+						World.loadPOIsFromCachedData(centerPointLatitude, centerPointLongitude, centerPointAltitude, centerPointAccuracy, false);  // これ以上、データは読み込まない。
 					}
 				}
 			});
@@ -183,7 +184,7 @@ var World = {
 	},
 
 	// cachedData変数の値をフィルタリングや変換を掛けながらPOIデータに移し替え、それを使ってPOIマーカーをロードします。
-	loadPOIsFromCachedData: function(centerPointLatitude, centerPointLongitude, centerPointAltitude, centerPointAccuracy) {
+	loadPOIsFromCachedData: function(centerPointLatitude, centerPointLongitude, centerPointAltitude, centerPointAccuracy, doSort) {
 		
 		var poiData = [];
 		
@@ -193,18 +194,25 @@ var World = {
 			if (distance > 500.0) continue;  // 0.5km（＝500m）以上先のPOIデータは破棄します。
 			var distanceString = (distance > 999) ? ((distance / 1000).toFixed(2) + " km") : (Math.round(distance) + " m");
 			
-			// ホットペッパーAPIでは位置検索の場合は距離順で返してくれるので、ソートはせずに、ここでマーカーの位置をばらけさせます。
-			var altitudeToSpread = i * Math.sqrt(distance) - 1.5;  // 本サンプルでは基準「-1.5」から上に向けてPOIマーカーの位置をバラけさせて表示しています。遠いほど倍々で高度が高くなります。「-1.5m」は手持ちのスマホの高さを考慮しています。
-			
 			poiData.push({
 				"id":        (cachedData[i].id),
 				"name":      (cachedData[i].name),       // レストラン名。
 				"latitude":  (cachedData[i].latitude),   // 緯度。
 				"longitude": (cachedData[i].longitude),  // 経度。
-				"altitude":  (altitudeToSpread),         // 高度。ちなみに標高の平均といえる「日本水準原点」の値は「24.3900」です。
+				"altitude":  (0.0),                      // 高度。ちなみに標高の平均といえる「日本水準原点」の値は「24.3900」です。
 				"distance":  (distanceString),           // 現在の地点からの距離（単位は「km」もしくは「m」）。
 				"sortorder": (distance)                  // 距離でソートできるようにしています。
 			});
+		}
+		
+		// キャッシュデータの場合のみ、距離が近い順でソートします。ホットペッパーAPIでは位置検索の場合は距離順で返してくれるので、ソートはしない。
+		if (doSort) poiData.sort(function(a,b){return a.sortorder - b.sortorder});
+		
+		// 距離がソートされた状態なので、距離と順番を基準にして高度を設定することで、マーカーの位置をばらけさせます。
+		for (var n = 0, length = poiData.length; n < length; n++) {
+			var altitudeToSpread = n * Math.sqrt(distance) - 1.5;  // 本サンプルでは基準「-1.5」から上に向けてPOIマーカーの位置をバラけさせて表示しています。遠いほど倍々で高度が高くなります。「-1.5m」は手持ちのスマホの高さを考慮しています。
+			poiData[n].altitude = altitudeToSpread;
+			//AR.logger.info(poiData[n].name + "［距離］：" + poiData[n].distance + "｜［高度］：" + poiData[n].altitude); // 距離と高度を確認するためのデバッグ用コード
 		}
 		
 		World.displayPOIs(poiData);
@@ -213,19 +221,28 @@ var World = {
 	// 表示されているARオブジェクトの距離表示を更新します。
 	updatePOIs: function (centerPointLatitude, centerPointLongitude, centerPointAltitude, centerPointAccuracy) {
 		
+		var isChangeOrder = false;
+		var lastDistance = -1;
 		for (var n = 0; n < World.markerList.length; n++) {
 			
 			var distance = World.getDistance(World.markerList[n].poiData.latitude, centerPointLatitude, World.markerList[n].poiData.longitude, centerPointLongitude);
 			//AR.logger.info(World.markerList[n].poiData.name + "【" + Math.round(distance) + "m】" + centerPointLatitude + "|" + centerPointLongitude + "|" + centerPointAltitude + "|" + centerPointAccuracy); // 位置情報の更新を確認するためのデバッグ用コード（ラベル更新しない場合を含む）
+			if (distance < lastDistance) isChangeOrder = true;
+			lastDistance = distance;
+			
 			if (distance > 500.0) {
 				// 既存のマーカーの中から0.5km（＝500m）以上先のPOIデータが出てきた場合は、全部をリロードし直します。
 				World.requestPOIsFromWebAPI(centerPointLatitude, centerPointLongitude, centerPointAltitude, centerPointAccuracy);
 				return;
 			}
+			
+			var distanceString = (distance > 999) ? ((distance / 1000).toFixed(2) + " km") : (Math.round(distance) + " m");
+			//AR.logger.info(World.markerList[n].poiData.name + "［ラベル更新］：" + World.markerList[n].poiData.distance + " => " + distanceString); // 位置情報更新とラベル表記変更を確認するためのデバッグ用コード
+			World.markerList[n].distanceLabel.text = World.markerList[n].poiData.distance = distanceString;  // ラベルとデータの両方を変更
 		}
+		if (isChangeOrder == false) return;
 		
-		cachedData.sort(function(a,b){return a.distance - b.distance}); // 距離が近い順でソートする
-		World.loadPOIsFromCachedData(centerPointLatitude, centerPointLongitude, centerPointAltitude, centerPointAccuracy);
+		World.loadPOIsFromCachedData(centerPointLatitude, centerPointLongitude, centerPointAltitude, centerPointAccuracy, true);
 	},
 
 	getDistance: function (targetLatitude, centerPointLatitude, targetLongtitude, centerPointLongitude) {
