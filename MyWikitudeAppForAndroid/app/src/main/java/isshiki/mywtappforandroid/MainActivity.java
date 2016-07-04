@@ -190,7 +190,8 @@ public class MainActivity extends AppCompatActivity {
 						MainActivity.this.architectView.setLocation(
 							location.getLatitude(),                                                // 緯度
 							location.getLongitude(),                                               // 経度
-							(location.hasAltitude() ? location.getAltitude() : UNKNOWN_ALTITUDE),  // 高度（m）。高度として「UNKNOWN_ALTITUDE」値が使われると、ARchitect Worldでは現在のユーザーの高度情報で代用されます。
+							0.0,                                                    // 高度（m）。本来なら↓のようにすべきですが、常に「0.0」にすることで、POIの位置を調整しやすくしています。
+							//(location.hasAltitude() ? location.getAltitude() : UNKNOWN_ALTITUDE),  // 高度（m）。高度として「UNKNOWN_ALTITUDE」値が使われると、ARchitect Worldでは現在のユーザーの高度情報で代用されます。
 							(location.hasAccuracy() ? location.getAccuracy() : 20)                 // 精度（m）。精度は、10m以内だと高い、11～35mなら普通、35m以上なら低いと判断してください。
 						);
 					}
