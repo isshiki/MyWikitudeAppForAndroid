@@ -2,8 +2,7 @@
 var World = {
 	
 	// TODO: 適切な「リクルートWEBサービス（ホットペーパー）」のキーを指定してください。
-	webApiKeyID: '＜ライセンスキーを書き直してください！＞00a',
-
+	webApiKeyID: '＜ライセンスキーを書き直してください！ 例：abc01234567890de＞',
 	// データロードを1回のみにするためのフラグ。
 	initiallyLoadedData: false,
 
@@ -20,8 +19,8 @@ var World = {
 	// 最後に選択されたマーカー。
 	currentMarker: null,
 
-	// 新しいPOIデータを注入するために呼ばれる関数。
-	loadPoisFromJsonData: function (poiData) {
+	// POIマーカーを作成・表示するために呼ばれる関数。
+	displayPOIs: function (poiData) {
 		
 		AR.context.destroyAll();
 		
@@ -76,14 +75,13 @@ var World = {
 		
 		// World.initiallyLoadedDataフラグを確認して、初回起動時にのみPOIデータをロードする処理を実行します。
 		if (!World.initiallyLoadedData) {
-			// 渡された緯度（＝latitude）と経度（＝longitude）を指定して、requestDataFromWebAPI関数を呼び出し、現在地周辺のPOIデータを取得します。
-			// 最後にフラグを「読み込み済み」（＝true）に設定します。
-			World.requestDataFromWebAPI(lat, lon, alt, acc);
-			World.initiallyLoadedData = true;
+			// 緯度・経度などを指定してrequestPOIsFromWebAPI関数を呼び出し、現在地周辺のPOIデータを取得し、マーカーを作成します。
+			World.requestPOIsFromWebAPI(lat, lon, alt, acc);
+			World.initiallyLoadedData = true;  // 最後にフラグを「読み込み済み」（＝true）に設定します。
 			
 		} else {
-			// 対象地点からの距離情報を頻繁に更新します。
-			World.updateDistanceValues(lat, lon, alt, acc);
+			// 緯度・経度などを指定してupdatePOIs関数を呼び出し、現在地周辺のPOIデータを更新し、マーカーを作成します。
+			World.updatePOIs(lat, lon, alt, acc);
 		}
 		
 		// テスト表示用（［i］ボタンをタップすると表示される状態メッセージをセットします）。
@@ -117,7 +115,7 @@ var World = {
 	},
 
 	// 指定された地点における全てのPOIデータをロードします。
-	requestDataFromWebAPI: function (centerPointLatitude, centerPointLongitude, centerPointAltitude, centerPointAccuracy) {
+	requestPOIsFromWebAPI: function (centerPointLatitude, centerPointLongitude, centerPointAltitude, centerPointAccuracy) {
 		
 		// 念のためValidate（値検証）しています。
 		if ("number" !== typeof centerPointLatitude || centerPointLatitude < -90) centerPointLatitude = -90;
@@ -127,13 +125,13 @@ var World = {
 		//if ("number" !== typeof centerPointAltitude) centerPointAltitude = parseFloat(centerPointAltitude); // 「centerPointAltitude = AR.CONST.UNKNOWN_ALTITUDE;」としても、同じユーザーレベル高度になります。本サンプルでは常に「0.0」が渡されています。
 		if ("number" !== typeof centerPointAccuracy || centerPointAccuracy > 20) return; // 精度値が20mより大きい場合は精度が悪すぎるので、以下の処理を実行しない。
 		
-		// myJsonDataオブジェクトは、myjsondata.jsに固定的に定義しておいたレストランのPOIデータです。
+		// cachedDataオブジェクトは、myjsondata.jsに固定的に定義しておいたレストランのPOIデータです。
 		// 本サンプルでは、ここで「ぐるなび」のWeb APIから動的にレストランデータを取得しています。
 		// Web APIを使わないで動作をテストしたい場合は、以下のコメントアウトを解除して、その下ののWebAPIの処理をコメントアウトてしてください。
-		//World.loadPoisFromMyJsonDataVariable(centerPointLatitude, centerPointLongitude, centerPointAltitude, centerPointAccuracy);
+		//World.loadPOIsFromCachedData(centerPointLatitude, centerPointLongitude, centerPointAltitude, centerPointAccuracy);
 		
 		// 以下では、「ぐるなび」のWeb APIから動的にレストランデータを取得して、それをPOIデータに加工して表示しています。
-		myJsonData = [];  // 新しく検索しなおすので、全てのデータをクリアしています。
+		cachedData = [];  // 新しく検索しなおすので、全てのデータをクリアしています。
 		var params = {
 			keyid: World.webApiKeyID,
 			format: 'jsonp',
@@ -144,7 +142,7 @@ var World = {
 			hit_per_page: 100,                // 1回のMAXは100件。
 			offset_page: 1                    // 1ページ目から取得していきます。
 		};
-		var loadPoisFromWebApi = function() {
+		var loadPOIsFromWebApi = function() {
 			var url = 'http://webservice.recruit.co.jp/hotpepper/gourmet/v1/?' + 
 				'key=' + params.keyid + 
 				'&lat=' + params.latitude + 
@@ -159,74 +157,75 @@ var World = {
 				var total_hit_count = parseInt(json.results.results_returned);
 				if (total_hit_count > 0) {
 					for (var n in json.results.shop) {
-						myJsonData.push({
+						cachedData.push({
 							"id":        (json.results.shop[n].id),
 							"name":      (json.results.shop[n].name),
 							"latitude":  parseFloat(json.results.shop[n].lat),
 							"longitude": parseFloat(json.results.shop[n].lng),
-						});  // 再ロードをできるだけ抑折するために、少し広めのレストランJSONデータをmyJsonData変数に保持しておきます。
+						});  // 再ロードをできるだけ抑折するために、少し広めのレストランJSONデータをcachedData変数に保持しておきます。
 					}
 					if ((params.hit_per_page * params.offset_page) < total_hit_count) {
 						params.offset_page++;
-						loadPoisFromWebApi();  // さらに次のページのデータを読み込む（再帰呼び出し）
+						loadPOIsFromWebApi();  // さらに次のページのデータを読み込む（再帰呼び出し）
 					} else {
-						World.loadPoisFromMyJsonDataVariable(centerPointLatitude, centerPointLongitude, centerPointAltitude, centerPointAccuracy);  // これ以上、データは読み込まない。
+						World.loadPOIsFromCachedData(centerPointLatitude, centerPointLongitude, centerPointAltitude, centerPointAccuracy);  // これ以上、データは読み込まない。
 					}
 				} else {
 					if (params.offset_page == 1) {
 						World.updateStatusMessage("0件（レストランが見付かりません！）、緯度・経度：" + lat + ", " + lon);
 					} else {
-						World.loadPoisFromMyJsonDataVariable(centerPointLatitude, centerPointLongitude, centerPointAltitude, centerPointAccuracy);  // これ以上、データは読み込まない。
+						World.loadPOIsFromCachedData(centerPointLatitude, centerPointLongitude, centerPointAltitude, centerPointAccuracy);  // これ以上、データは読み込まない。
 					}
 				}
 			});
 		};
-		loadPoisFromWebApi();
+		loadPOIsFromWebApi();
 	},
 
-	// myJsonData変数の値をフィルタリングや変換を掛けながらPOIデータに移し替え、それを使ってPOIマーカーをロードします。
-	loadPoisFromMyJsonDataVariable: function(centerPointLatitude, centerPointLongitude, centerPointAltitude, centerPointAccuracy) {
+	// cachedData変数の値をフィルタリングや変換を掛けながらPOIデータに移し替え、それを使ってPOIマーカーをロードします。
+	loadPOIsFromCachedData: function(centerPointLatitude, centerPointLongitude, centerPointAltitude, centerPointAccuracy) {
 		
 		var poiData = [];
-		var altitudeUnit = 15.0;
 		
-		for (var i = 0, length = myJsonData.length; i < length; i++) {
+		for (var i = 0, length = cachedData.length; i < length; i++) {
 			
-			var distance = World.getDistance(myJsonData[i].latitude, centerPointLatitude, myJsonData[i].longitude, centerPointLongitude);
+			var distance = World.getDistance(cachedData[i].latitude, centerPointLatitude, cachedData[i].longitude, centerPointLongitude);
 			if (distance > 500.0) continue;  // 0.5km（＝500m）以上先のPOIデータは破棄します。
 			var distanceString = (distance > 999) ? ((distance / 1000).toFixed(2) + " km") : (Math.round(distance) + " m");
 			
+			// ホットペッパーAPIでは位置検索の場合は距離順で返してくれるので、ソートはせずに、ここでマーカーの位置をばらけさせます。
+			var altitudeToSpread = i * Math.sqrt(distance) - 1.5;  // 本サンプルでは基準「-1.5」から上に向けてPOIマーカーの位置をバラけさせて表示しています。遠いほど倍々で高度が高くなります。「-1.5m」は手持ちのスマホの高さを考慮しています。
+			
 			poiData.push({
-				"id":        (myJsonData[i].id),
-				"name":      (myJsonData[i].name),       // レストラン名。
-				"latitude":  (myJsonData[i].latitude),   // 緯度。
-				"longitude": (myJsonData[i].longitude),  // 経度。
-				"altitude":  (i * altitudeUnit),         // 高度。本サンプルでは基準「0.0」から上に向けてPOIマーカーの位置をバラけさせて表示しています。ちなみに標高の平均といえる「日本水準原点」の値は「24.3900」です。
+				"id":        (cachedData[i].id),
+				"name":      (cachedData[i].name),       // レストラン名。
+				"latitude":  (cachedData[i].latitude),   // 緯度。
+				"longitude": (cachedData[i].longitude),  // 経度。
+				"altitude":  (altitudeToSpread),         // 高度。ちなみに標高の平均といえる「日本水準原点」の値は「24.3900」です。
 				"distance":  (distanceString),           // 現在の地点からの距離（単位は「km」もしくは「m」）。
 				"sortorder": (distance)                  // 距離でソートできるようにしています。
 			});
 		}
-		//poiData.sort(function(a,b){return a.sortorder - b.sortorder}); // 距離が近い順でソートする（※ホットペッパーAPIでは位置検索の場合は距離順で返してくれる）。
 		
-		World.loadPoisFromJsonData(poiData);
+		World.displayPOIs(poiData);
 	},
 
 	// 表示されているARオブジェクトの距離表示を更新します。
-	updateDistanceValues: function (centerPointLatitude, centerPointLongitude, centerPointAltitude, centerPointAccuracy) {
+	updatePOIs: function (centerPointLatitude, centerPointLongitude, centerPointAltitude, centerPointAccuracy) {
 		
-		for (var i = 0; i < World.markerList.length; i++) {
+		for (var n = 0; n < World.markerList.length; n++) {
 			
-			var distance = World.getDistance(World.markerList[i].poiData.latitude, centerPointLatitude, World.markerList[i].poiData.longitude, centerPointLongitude);
-			//AR.logger.info(World.markerList[i].poiData.name + "【" + Math.round(distance) + "m】" + centerPointLatitude + "|" + centerPointLongitude + "|" + centerPointAltitude + "|" + centerPointAccuracy); // 位置情報の更新を確認するためのデバッグ用コード（ラベル更新しない場合を含む）
+			var distance = World.getDistance(World.markerList[n].poiData.latitude, centerPointLatitude, World.markerList[n].poiData.longitude, centerPointLongitude);
+			//AR.logger.info(World.markerList[n].poiData.name + "【" + Math.round(distance) + "m】" + centerPointLatitude + "|" + centerPointLongitude + "|" + centerPointAltitude + "|" + centerPointAccuracy); // 位置情報の更新を確認するためのデバッグ用コード（ラベル更新しない場合を含む）
 			if (distance > 500.0) {
 				// 既存のマーカーの中から0.5km（＝500m）以上先のPOIデータが出てきた場合は、全部をリロードし直します。
-				World.requestDataFromWebAPI(centerPointLatitude, centerPointLongitude, centerPointAltitude, centerPointAccuracy);
+				World.requestPOIsFromWebAPI(centerPointLatitude, centerPointLongitude, centerPointAltitude, centerPointAccuracy);
 				return;
 			}
-			var distanceString = (distance > 999) ? ((distance / 1000).toFixed(2) + " km") : (Math.round(distance) + " m");
-			//AR.logger.info(World.markerList[i].poiData.name + "［ラベル更新］：" + World.markerList[i].poiData.distance + " => " + distanceString); // 位置情報更新とラベル表記変更を確認するためのデバッグ用コード
-			World.markerList[i].distanceLabel.text = World.markerList[i].poiData.distance = distanceString;  // ラベルとデータの両方を変更
 		}
+		
+		cachedData.sort(function(a,b){return a.distance - b.distance}); // 距離が近い順でソートする
+		World.loadPOIsFromCachedData(centerPointLatitude, centerPointLongitude, centerPointAltitude, centerPointAccuracy);
 	},
 
 	getDistance: function (targetLatitude, centerPointLatitude, targetLongtitude, centerPointLongitude) {
