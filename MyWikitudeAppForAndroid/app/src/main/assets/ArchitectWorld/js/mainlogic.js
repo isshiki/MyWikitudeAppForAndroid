@@ -173,7 +173,7 @@ var World = {
 					}
 				} else {
 					if (params.offset_page == 1) {
-						World.updateStatusMessage("0件（レストランが見付かりません！）、緯度・経度：" + lat + ", " + lon);
+						World.updateStatusMessage("0件（レストランが見付かりません！）、緯度・経度：" + centerPointLatitude + ", " + centerPointLongitude);
 					} else {
 						World.loadPOIsFromCachedData(centerPointLatitude, centerPointLongitude, centerPointAltitude, centerPointAccuracy, false);  // これ以上、データは読み込まない。
 					}
