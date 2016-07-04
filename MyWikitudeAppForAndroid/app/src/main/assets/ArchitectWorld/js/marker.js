@@ -1,4 +1,4 @@
-function Marker(poiData) {
+function Marker(poiData, orderNumber) {
 
 	/*
 		マーカー（＝ポップアップするバルーンUI）を作成するには、
@@ -56,9 +56,10 @@ function Marker(poiData) {
 	this.markerObject = new AR.GeoObject(markerLocation, {
 		drawables: {
 			cam: [this.markerDrawable_idle, this.markerDrawable_selected, this.distanceLabel, this.nameLabel]
-		}
+		},
+		renderingOrder: (orderNumber)
 		/*
-			ここではdrawablesオプションを指定していますが、指定可能なオプションは以下のとおりです。
+			ここではdrawables／renderingOrderオプションを指定していますが、指定可能なオプションは以下のとおりです。
 			 ・enabled： Boolean型（デフォルト値: true）。有効／無効を指定します。
 			 ・renderingOrder： Number型（デフォルト値: 0） 。描画順序を指定します。
 			 ・onEnterFieldOfVision：AR.GeoObjectが表示開始された時の処理を実施する関数を指定します。
@@ -98,9 +99,14 @@ Marker.prototype.getOnClickTrigger = function(marker) {
 	};
 };
 
+var renderringOrderLevel = 1000; // レンダリング順序の番号はこの数値を基準に指定します。タップされた場合は、この数値を抜くことで最上位にします。
+
 Marker.prototype.setSelected = function(marker) {
 	
 	marker.isSelected = true;
+	if (marker.markerObject.renderingOrder < renderringOrderLevel) {
+		marker.markerObject.renderingOrder = marker.markerObject.renderingOrder + renderringOrderLevel;  // 選択されたものを最上位に表示します。
+	}
 	
 	marker.markerDrawable_idle.opacity = 0.0;
 	marker.markerDrawable_selected.opacity = 1.0;
@@ -112,6 +118,9 @@ Marker.prototype.setSelected = function(marker) {
 Marker.prototype.setDeselected = function(marker) {
 	
 	marker.isSelected = false;
+	if (marker.markerObject.renderingOrder > renderringOrderLevel) {
+		marker.markerObject.renderingOrder = marker.markerObject.renderingOrder - renderringOrderLevel;  // 選択解除されたものを元の位置に表示します。
+	}
 	
 	marker.markerDrawable_idle.opacity = 1.0;
 	marker.markerDrawable_selected.opacity = 0.0;

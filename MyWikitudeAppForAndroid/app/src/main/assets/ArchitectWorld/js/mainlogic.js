@@ -34,20 +34,21 @@ var World = {
 		
 		// 全てのPOI情報をループしながら、1つのPOIごとにAR.GeoObject（＝マーカー）を作成します。近場の10件を、遠いとこから順に作成していきます。
 		if (poiData.length <= 0) return;
-		for (var currentPlaceNr = (poiData.length < 10) ? (poiData.length - 1) : (10 - 1); currentPlaceNr >= 0; currentPlaceNr--) {
+		var renderingMaxCount = 10;
+		for (var number = (poiData.length < renderingMaxCount) ? (poiData.length - 1) : (renderingMaxCount - 1); number >= 0; number--) {
 			
 			var singlePoi = {
-				"id":          poiData[currentPlaceNr].id,
-				"name":        poiData[currentPlaceNr].name,
-				"latitude":    poiData[currentPlaceNr].latitude,
-				"longitude":   poiData[currentPlaceNr].longitude,
-				"altitude":    poiData[currentPlaceNr].altitude,
-				"distance":    poiData[currentPlaceNr].distance
+				"id":          poiData[number].id,
+				"name":        poiData[number].name,
+				"latitude":    poiData[number].latitude,
+				"longitude":   poiData[number].longitude,
+				"altitude":    poiData[number].altitude,
+				"distance":    poiData[number].distance
 			};
 			
 			// ユーザーが何もないスクリーン上をタップした際に選択中のマーカーを選択解除できるようにするため、
 			// 1つ1つのマーカーが含まれる配列をWorldオブジェクトに保持させます。
-			World.markerList.push(new Marker(singlePoi));
+			World.markerList.push(new Marker(singlePoi, renderingMaxCount - number));
 		}
 		
 	},
