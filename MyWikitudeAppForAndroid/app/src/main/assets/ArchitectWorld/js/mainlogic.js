@@ -86,7 +86,7 @@ var World = {
 		}
 		
 		// テスト表示用（［i］ボタンをタップすると表示される状態メッセージをセットします）。
-		World.updateStatusMessage(World.markerList.length + "件、緯度・経度：" + lat + ", " + lon);
+		World.updateStatusMessage(World.markerList.length + "件、緯度・経度・高度・精度：" + lat + ", " + lon + ", " + alt + ", " + acc);
 		//alert("緯度・経度：" + lat + ", " + lon);
 		
 		World.changingLocationDisplay = false;
@@ -210,7 +210,7 @@ var World = {
 		
 		// 距離がソートされた状態なので、距離と順番を基準にして高度を設定することで、マーカーの位置をばらけさせます。
 		for (var n = 0, length = poiData.length; n < length; n++) {
-			var altitudeToSpread = n * Math.sqrt(distance) - 1.5;  // 本サンプルでは基準「-1.5」から上に向けてPOIマーカーの位置をバラけさせて表示しています。遠いほど倍々で高度が高くなります。「-1.5m」は手持ちのスマホの高さを考慮しています。
+			var altitudeToSpread = n * Math.sqrt(distance / 3);  // 本サンプルでは基準「0.0」から上に向けてPOIマーカーの位置をバラけさせて表示しています。遠いほど倍々で高度が高くなります。
 			poiData[n].altitude = altitudeToSpread;
 			//AR.logger.info(poiData[n].name + "［距離］：" + poiData[n].distance + "｜［高度］：" + poiData[n].altitude); // 距離と高度を確認するためのデバッグ用コード
 		}
