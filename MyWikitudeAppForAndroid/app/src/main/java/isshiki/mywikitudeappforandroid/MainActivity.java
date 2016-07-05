@@ -112,8 +112,8 @@ public class MainActivity extends AppCompatActivity {
 		RequestPermission();
 		if (this.isFinishing()) return;
 		
-		//　ARビュー用のアクティビティ（"\app\src\main\res\layout\activity_main_ar.xml"）を設定します。
-		setContentView(R.layout.activity_main_ar);
+		//　ARビュー用のアクティビティ（"\app\src\main\res\layout\activity_main.xml"）を設定します。
+		setContentView(R.layout.activity_main);
 		
 		// アクティビティのタイトルを設定します。
 		this.setTitle(MAIN_ACTIVITY_TITLE);
