@@ -39,7 +39,7 @@ import java.util.HashMap;
 import java.util.List;
 
 /**
- * architectView（＝ARのビュー）を全面表示するメインのアクティビティ。
+ * ARchitectView（＝ARのビュー）を全面表示するメインのアクティビティ。
  */
 public class MainActivity extends AppCompatActivity {
 
@@ -55,7 +55,7 @@ public class MainActivity extends AppCompatActivity {
 	/** ARchitect WorldとなるHTMLファイルのURLを定数として定義。*/
 	protected static final String MAIN_ARCHITECT_WORLD_URL = "ArchitectWorld/index.html";
 
-	/** architectViewに指定するARオブジェクトの表示除外基準の距離。デフォルトでは50km。※デフォルトのままなのでコメントアウトしています。*/
+	/** ARchitectViewに指定するARオブジェクトの表示除外基準の距離。デフォルトでは50km。※デフォルトのままなのでコメントアウトしています。*/
 	//protected static final int CULLING_DISTANCE_METERS = 50 * 1000;
 
 	/** 高度情報が不明もしくは取得できない場合の値。-32768は地球上には表示できない高度レベルとなります。Wikitude JavaScript APIにおける「AR.CONST.UNKNOWN_ALTITUDE」と同じ値です。*/
@@ -71,7 +71,7 @@ public class MainActivity extends AppCompatActivity {
 
 	/** 端末のセンサーにおける精度が変化したことを受信するためのリスナー。*/
 	protected ArchitectView.SensorAccuracyChangeListener sensorAccuracyListener;
-	/** 位置情報の更新を受信するためのリスナー。これを、architectViewに通知して、ARchitect Worldの位置情報を更新します。*/
+	/** 位置情報の更新を受信するためのリスナー。これを、ARchitectViewに通知して、ARchitect Worldの位置情報を更新します。*/
 	protected LocationListener locationListener;
 	/** JavaScript内のdocument.locationで用いるARchitect World用「architectsdk://」プロトコル経由のURL呼び出しを受信するためのリスナー（※本サンプルではコードはありますが実質的には使っていません）。*/
 	protected ArchitectView.ArchitectUrlListener urlListener;
@@ -112,7 +112,7 @@ public class MainActivity extends AppCompatActivity {
 		RequestPermission();
 		if (this.isFinishing()) return;
 		
-		//　ARビュー用のアクティビティ（"\app\src\main\res\layout\activity_main.xml"）を設定します。
+		// ARビュー用のレイアウト（"\app\src\main\res\layout\activity_main.xml"）を設定します。
 		setContentView(R.layout.activity_main);
 		
 		// アクティビティのタイトルを設定します。
@@ -127,13 +127,13 @@ public class MainActivity extends AppCompatActivity {
 		// ライフサイクル通知などに対するARchitectViewを設定します。
 		this.architectView = (ArchitectView) this.findViewById(R.id.architectView);
 		
-		// SDKキーを指定します。
+		// SDKキーと必要な機能（ジオロケーションと2D画像トラッキング）を指定します。
 		final StartupConfiguration config = new StartupConfiguration(
 				WIKITUDE_SDK_KEY,
 				StartupConfiguration.Features.Geo | StartupConfiguration.Features.Tracking2D,
 				StartupConfiguration.CameraPosition.DEFAULT);
 		
-		// architectViewのライフサイクルメソッド「onCreate」を呼び出す必要があります。
+		// ARchitectViewのライフサイクルメソッド「onCreate」を呼び出す必要があります。
 		try {
 			this.architectView.onCreate(config);
 		} catch (RuntimeException rex) {
@@ -144,11 +144,11 @@ public class MainActivity extends AppCompatActivity {
 		
 		// 精度リスナーのオブジェクトを作成します。このリスナーを活用して、コンパスのキャリブレーションを促すプロンプトなどを表示します。
 		this.sensorAccuracyListener = this.getSensorAccuracyListener();
-		// ※architectViewへの精度リスナーの登録／登録解除は、ここではなく後述のonResume()メソッド／onPause()メソッドで行っています。
+		// ※ARchitectViewへの精度リスナーの登録／登録解除は、ここではなく後述のonResume()メソッド／onPause()メソッドで行っています。
 		
 		// ARchitect World用URLリスナーのオブジェクトを作成します。「document.location = 'architectsdk://foo?bar=123'」のようにしてJavaScript上で呼び出されたURLはこのリスナーに通知されます。これを利用することで、 「JavaScriptコード」と「ネイティブAndroidアクティビティ／フラグメント」の間でのやり取りが実現できます。
 		this.urlListener = this.getUrlListener();
-		// ※architectViewへのARchitect World用URLリスナーの登録を行います。イベントの受け取り漏れを無くすために、コンテンツがロードされる前のここで必ず登録するようにしてください。
+		// ※ARchitectViewへのARchitect World用URLリスナーの登録を行います。イベントの受け取り漏れを無くすために、コンテンツがロードされる前のここで必ず登録するようにしてください。
 		if (this.urlListener != null && this.architectView != null) {
 			this.architectView.registerUrlListener(this.getUrlListener());
 		}
@@ -170,7 +170,7 @@ public class MainActivity extends AppCompatActivity {
 			
 			@Override
 			public void onLocationChanged(final Location location) {
-				// LocationProviderが、位置情報の更新をこのメソッドに伝達します。ここではarchitectViewに位置情報を引き渡すことで、ARchitect Worldの位置情報を更新します。
+				// LocationProviderが、位置情報の更新をこのメソッドに伝達します。ここではARchitectViewに位置情報を引き渡すことで、ARchitect Worldの位置情報を更新します。
 				if (location != null) {
 					// アプリ内のどこかで位置情報が必要になる場合に備えて、最新（＝前回）の位置情報を保存しておきます。
 					MainActivity.this.lastKnownLocaton = location;
@@ -186,7 +186,7 @@ public class MainActivity extends AppCompatActivity {
 						// 高度および精度の情報を確認するためのデバッグ用コード
 						//Toast.makeText(MainActivity.this, (location.hasAltitude() ? "高度あり｜" : "高度なし｜")+ location.getAltitude() + "\n" + (location.hasAccuracy() ? "精度あり｜" : "精度なし｜") + location.getAccuracy(), Toast.LENGTH_LONG).show();
 						
-						// architectViewの位置情報を更新します。
+						// ARchitectViewの位置情報を更新します。
 						MainActivity.this.architectView.setLocation(
 							location.getLatitude(),                                                // 緯度
 							location.getLongitude(),                                               // 経度
@@ -237,7 +237,7 @@ public class MainActivity extends AppCompatActivity {
 		
 		if (this.architectView != null) {
 			
-			// architectViewのライフサイクルメソッド「onPostCreate」を呼び出す必要があります。
+			// ARchitectViewのライフサイクルメソッド「onPostCreate」を呼び出す必要があります。
 			this.architectView.onPostCreate();
 			
 			try {
@@ -245,7 +245,7 @@ public class MainActivity extends AppCompatActivity {
 				// ※Android向けでは、HTMLファイル内に「<script src="architect://architect.js"></script>」を必ず記載する必要があります。
 				this.architectView.load(MAIN_ARCHITECT_WORLD_URL);
 				
-				// 対象範囲外の距離をarchitectViewに設定します。デフォルトでは50kmです。※本サンプルではARchitectWorldのメインロジックで手動で500m以内にさらに範囲限定しています。
+				// 対象範囲外の距離をARchitectViewに設定します。デフォルトでは50kmです。※本サンプルではARchitectWorldのメインロジックで手動で500m以内にさらに範囲限定しています。
 				//this.architectView.setCullingDistance(CULLING_DISTANCE_METERS);  // ※デフォルトのままなのでコメントアウトしています。
 				
 				// ARchitect World内のARオブジェクトであるVideoDrawablesが、現在の端末でサポートされているかを検証し、できない場合はメッセージをトーストします。
@@ -269,11 +269,11 @@ public class MainActivity extends AppCompatActivity {
 	protected void onResume() {
 		super.onResume();
 		
-		// architectViewのライフサイクルメソッド「onResume」を呼び出す必要があります。
+		// ARchitectViewのライフサイクルメソッド「onResume」を呼び出す必要があります。
 		if (this.architectView != null) {
 			this.architectView.onResume();
 			
-			// architectViewに精度リスナーを登録します。
+			// ARchitectViewに精度リスナーを登録します。
 			if (this.sensorAccuracyListener != null) {
 				this.architectView.registerSensorAccuracyChangeListener(this.sensorAccuracyListener);
 			}
@@ -292,11 +292,11 @@ public class MainActivity extends AppCompatActivity {
 	protected void onPause() {
 		super.onPause();
 		
-		// architectViewのライフサイクルメソッド「onPause」を呼び出す必要があります。
+		// ARchitectViewのライフサイクルメソッド「onPause」を呼び出す必要があります。
 		if (this.architectView != null) {
 			this.architectView.onPause();
 			
-			// architectViewから精度リスナーを登録解除します。
+			// ARchitectViewから精度リスナーを登録解除します。
 			if (this.sensorAccuracyListener != null) {
 				this.architectView.unregisterSensorAccuracyChangeListener(this.sensorAccuracyListener);
 			}
@@ -344,7 +344,7 @@ public class MainActivity extends AppCompatActivity {
 	protected void onDestroy() {
 		super.onDestroy();
 		
-		// architectViewのライフサイクルメソッド「onDestroy」を呼び出す必要があります。
+		// ARchitectViewのライフサイクルメソッド「onDestroy」を呼び出す必要があります。
 		if (this.architectView != null) {
 			this.architectView.onDestroy();
 		}
@@ -357,7 +357,7 @@ public class MainActivity extends AppCompatActivity {
 	public void onLowMemory() {
 		super.onLowMemory();
 		
-		// architectViewのライフサイクルメソッド「onLowMemory」を呼び出す必要があります。
+		// ARchitectViewのライフサイクルメソッド「onLowMemory」を呼び出す必要があります。
 		if ( this.architectView != null ) {
 			this.architectView.onLowMemory();
 		}
@@ -414,7 +414,7 @@ public class MainActivity extends AppCompatActivity {
 	// region センサー精度の低下を管理（必要であればユーザーにコンパスのキャリブレーションを促す）
 
 	/**
-	 * architectView用のセンサー精度変化リスナーとして指定するオブジェクトを生成して返します。URLリスナーの中には、コンパスの精度が変化したときに呼び出されるonCompassAccuracyChanged()メソッドを実装しています。
+	 * ARchitectView用のセンサー精度変化リスナーとして指定するオブジェクトを生成して返します。URLリスナーの中には、コンパスの精度が変化したときに呼び出されるonCompassAccuracyChanged()メソッドを実装しています。
 	 * @return architectView用のセンサー精度変化リスナー。
 	 */
 	protected ArchitectView.SensorAccuracyChangeListener getSensorAccuracyListener() {
@@ -438,7 +438,7 @@ public class MainActivity extends AppCompatActivity {
 
 	/**
 	 *
-	 * @return architectView用のURLリスナー。
+	 * @return ARchitectView用のURLリスナー。
 	 */
 	public ArchitectView.ArchitectUrlListener getUrlListener() {
 		return new ArchitectView.ArchitectUrlListener() {
@@ -633,7 +633,7 @@ public class MainActivity extends AppCompatActivity {
 	// region 共通のプライベートメソッド（※本サンプルではコードはありますが、いずれも実質的には使っていません）
 
 	/**
-	 * ネイティブコードであるarchitectView側から、HTMLコードであるARchitect World内のJavaScriptメソッドを呼び出します。
+	 * ネイティブコードであるARchitectView側から、HTMLコードであるARchitect World内のJavaScriptメソッドを呼び出します。
 	 *
 	 * @param methodName 呼び出し対象のJavaScriptメソッド名
 	 * @param arguments メソッドへの引数
