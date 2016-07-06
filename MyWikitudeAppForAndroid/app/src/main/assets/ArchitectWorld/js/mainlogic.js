@@ -1,7 +1,7 @@
 // ARchitect World（＝AR体験）の実装
 var World = {
 	
-	// TODO: 適切な「リクルートWEBサービス（ホットペーパー）」のキーを指定してください。
+	// TODO: 適切な「リクルートWEBサービス（ホットペッパー）」のキーを指定してください。
 	webApiKeyID: '＜ライセンスキーを書き直してください！ 例：abc01234567890de＞',
 
 	// データロードを1回のみにするためのフラグ。
@@ -127,11 +127,11 @@ var World = {
 		if ("number" !== typeof centerPointAccuracy || centerPointAccuracy > 20) return; // 精度値が20mより大きい場合は精度が悪すぎるので、以下の処理を実行しない。
 		
 		// cachedDataオブジェクトは、cacheddata.jsに固定的に定義しておいたレストランのPOIデータです。
-		// 本サンプルでは、ここで「ホットペーパー」のWeb APIから動的にレストランデータを取得しています。
+		// 本サンプルでは、ここで「ホットペッパー」のWeb APIから動的にレストランデータを取得しています。
 		// Web APIを使わないで動作をテストしたい場合は、以下のコメントアウトを解除して、その下ののWebAPIの処理をコメントアウトてしてください。
 		//World.loadPOIsFromCachedData(centerPointLatitude, centerPointLongitude, centerPointAltitude, centerPointAccuracy);
 		
-		// 以下では、「ホットペーパー」のWeb APIから動的にレストランデータを取得して、それをPOIデータに加工して表示しています。
+		// 以下では、「ホットペッパー」のWeb APIから動的にレストランデータを取得して、それをPOIデータに加工して表示しています。
 		cachedData = [];  // 新しく検索しなおすので、全てのデータをクリアしています。
 		var params = {
 			keyid: World.webApiKeyID,
