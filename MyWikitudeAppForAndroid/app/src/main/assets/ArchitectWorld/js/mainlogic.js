@@ -126,7 +126,7 @@ var World = {
 		//if ("number" !== typeof centerPointAltitude) centerPointAltitude = parseFloat(centerPointAltitude); // 「centerPointAltitude = AR.CONST.UNKNOWN_ALTITUDE;」としても、同じユーザーレベル高度になります。本サンプルでは常に「0.0」が渡されています。
 		if ("number" !== typeof centerPointAccuracy || centerPointAccuracy > 20) return; // 精度値が20mより大きい場合は精度が悪すぎるので、以下の処理を実行しない。
 		
-		// cachedDataオブジェクトは、myjsondata.jsに固定的に定義しておいたレストランのPOIデータです。
+		// cachedDataオブジェクトは、cacheddata.jsに固定的に定義しておいたレストランのPOIデータです。
 		// 本サンプルでは、ここで「ぐるなび」のWeb APIから動的にレストランデータを取得しています。
 		// Web APIを使わないで動作をテストしたい場合は、以下のコメントアウトを解除して、その下ののWebAPIの処理をコメントアウトてしてください。
 		//World.loadPOIsFromCachedData(centerPointLatitude, centerPointLongitude, centerPointAltitude, centerPointAccuracy);
